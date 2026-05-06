@@ -9,82 +9,45 @@ app.use(cors());
 app.use(express.json());
 
 // ============================================================
-// AGRICULTURE KNOWLEDGE BASE
+// KNOWLEDGE BASE
 // ============================================================
 const FARMING_KNOWLEDGE = `
 GOVERNMENT SCHEMES:
-1. PM-Kisan: ₹6000/year in 3 installments of ₹2000. Eligibility: farmers with up to 2 hectares land. Apply at pmkisan.gov.in or nearest CSC center. Need: Aadhaar, bank account, land records.
-2. PMFBY (Crop Insurance): Covers crop loss from drought, flood, pest. Premium: 2% for Kharif, 1.5% for Rabi, 5% for horticulture. Apply before sowing through bank or CSC.
-3. Kisan Credit Card: Credit up to ₹3 lakh at 4% interest. Apply at any nationalized bank. Need: Aadhaar, land proof, bank account.
-4. eNAM: Online mandi platform. Sell crops directly to buyers. Register at enam.gov.in. Available in 1000+ mandis.
+1. PM-Kisan: ₹6000/year in 3 installments. Eligibility: up to 2 hectares land. Apply: pmkisan.gov.in
+2. PMFBY: Crop insurance. Premium 2% Kharif, 1.5% Rabi. Apply through bank or CSC.
+3. Kisan Credit Card: Credit up to ₹3 lakh at 4% interest. Apply at any nationalized bank.
+4. eNAM: Online mandi. Sell directly to buyers. Register: enam.gov.in
 5. Soil Health Card: Free soil testing every 2 years. Visit nearest agriculture office.
 6. Kisan Samman Nidhi: Same as PM-Kisan.
 7. PM Fasal Bima: Same as PMFBY.
-8. Digital Agriculture Mission: Free digital tools and training for all registered farmers.
-9. AgriStack: Unified farmer database — digital identity for all farmers.
 
-CROP GUIDANCE BY SEASON:
-KHARIF (June-October): Rice, Maize, Cotton, Sugarcane, Soybean, Groundnut, Bajra
-- Sow after first monsoon rain
-- Rice needs 20-25°C, 150cm+ rainfall
-- Cotton needs deep black soil, 21-30°C
-
-RABI (November-April): Wheat, Barley, Mustard, Gram, Peas
-- Sow in October-November after monsoon
-- Wheat needs 10-15°C at sowing, 21-26°C at harvest
-- Mustard grows well in sandy loam soil
-
-ZAID (March-June): Watermelon, Cucumber, Muskmelon, Moong
+CROP SEASONS:
+- KHARIF (June-Oct): Rice, Maize, Cotton, Sugarcane, Soybean, Groundnut, Bajra
+- RABI (Nov-Apr): Wheat, Barley, Mustard, Gram, Peas
+- ZAID (Mar-Jun): Watermelon, Cucumber, Moong
 
 SOIL TYPES:
-- Black soil (Regur): Best for cotton, sugarcane, wheat. Found in Maharashtra, MP, Gujarat
-- Red soil: Good for millets, pulses, oilseeds. Found in Tamil Nadu, Karnataka, AP
-- Alluvial soil: Best for rice, wheat, sugarcane. Found in Punjab, UP, Bihar
-- Laterite soil: Good for tea, coffee, cashew. Found in Kerala, Karnataka hills
+- Black soil: Cotton, sugarcane, wheat — Maharashtra, MP, Gujarat
+- Red soil: Millets, pulses — Tamil Nadu, Karnataka
+- Alluvial soil: Rice, wheat, sugarcane — Punjab, UP, Bihar
+- Laterite soil: Tea, coffee, cashew — Kerala, Karnataka
 
-COMMON DISEASES & SOLUTIONS:
-- Rice blast: Use Tricyclazole fungicide, maintain proper water level
-- Wheat rust: Use Propiconazole, sow resistant varieties
-- Cotton bollworm: Use Bt cotton varieties, neem-based pesticides
-- Late blight (potato/tomato): Use Mancozeb, avoid overhead irrigation
+DISEASES & SOLUTIONS:
+- Rice blast: Tricyclazole fungicide
+- Wheat rust: Propiconazole fungicide
+- Cotton bollworm: Bt cotton, neem pesticides
+- Late blight: Mancozeb, avoid overhead irrigation
 
-FERTILIZER GUIDE:
+FERTILIZER:
 - Rice: NPK 120:60:60 kg/hectare
 - Wheat: NPK 120:60:40 kg/hectare
 - Cotton: NPK 150:75:75 kg/hectare
-- Always do soil test before applying fertilizers
-- Organic: Use FYM 10 tons/hectare
 
 HELPLINES:
 - Kisan Call Center: 1800-180-1551 (free, 24x7)
 - PM-Kisan: 155261
-- Agriculture Ministry: 011-23382012
-- Weather forecast: 1800-180-1717
-
-DIGITAL TOOLS:
-- Kisan Suvidha App: Weather, market prices, plant protection
-- mKisan Portal: SMS advisory service
-- AgriMarket App: Real-time mandi prices
-- Crop Insurance App: PMFBY enrollment
+- Weather: 1800-180-1717
 `;
-
-// ============================================================
-// CROP CALENDAR (current month auto-detected)
-// ============================================================
-const CROP_CALENDAR = {
-  1:  "Rabi season — wheat, barley, mustard growing. Irrigation important.",
-  2:  "Rabi season — harvest preparation for mustard and gram.",
-  3:  "Zaid season — watermelon, cucumber, moong sowing time.",
-  4:  "Zaid + Rabi harvest — wheat and barley harvesting.",
-  5:  "Pre-Kharif — deep ploughing, soil testing, seed selection.",
-  6:  "Kharif begins — rice, cotton, soybean, groundnut sowing after first rain.",
-  7:  "Kharif — bajra, jowar, sugarcane sowing. Rice transplanting.",
-  8:  "Kharif growing — pest monitoring critical. Cotton bollworm alert.",
-  9:  "Kharif harvest prep — maize, groundnut harvest. Rabi land prep.",
-  10: "Rabi sowing — wheat, mustard, gram. Rice harvesting.",
-  11: "Rabi — wheat irrigation, fertilization, winter care.",
-  12: "Rabi — frost protection critical. Wheat care and irrigation.",
-};
 
 // ============================================================
 // RATE LIMITER
@@ -105,7 +68,7 @@ function rateLimiter(req, res, next) {
 }
 
 // ============================================================
-// WEATHER ROUTE
+// WEATHER API ROUTE
 // ============================================================
 app.get("/weather", async (req, res) => {
   const { city } = req.query;
@@ -113,7 +76,7 @@ app.get("/weather", async (req, res) => {
 
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${process.env.WEATHER_API_KEY}&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${process.env.WEATHER_API_KEY}&units=metric&lang=hi`
     );
     const data = await response.json();
 
@@ -121,28 +84,31 @@ app.get("/weather", async (req, res) => {
       return res.status(404).json({ error: "City not found" });
     }
 
-    const advice = getFarmingAdvice(
-      data.main.temp,
-      data.main.humidity,
-      data.weather[0].main
-    );
-
-    res.json({
+    // Format farming-friendly weather response
+    const weather = {
       city: data.name,
       temp: data.main.temp,
       feels_like: data.main.feels_like,
       humidity: data.main.humidity,
       description: data.weather[0].description,
       wind_speed: data.wind.speed,
-      farming_advice: advice,
-    });
+      farming_advice: getFarmingWeatherAdvice(
+        data.main.temp,
+        data.main.humidity,
+        data.weather[0].main
+      ),
+    };
+
+    res.json(weather);
   } catch (err) {
     res.status(500).json({ error: "Weather service error" });
   }
 });
 
-function getFarmingAdvice(temp, humidity, condition) {
+// Farming advice based on weather
+function getFarmingWeatherAdvice(temp, humidity, condition) {
   const advice = [];
+
   if (condition === "Rain") {
     advice.push("Aaj irrigation band rakhen — baarish ho rahi hai");
     advice.push("Fungal disease ka dhyan rakhen — Mancozeb spray karen");
@@ -156,13 +122,14 @@ function getFarmingAdvice(temp, humidity, condition) {
     advice.push("Rabi crops ke liye achha mausam hai");
   }
   if (humidity > 80) {
-    advice.push("Zyada nami — fungal bimari ka khatra");
+    advice.push("Zyada nami — fungal bimari ka khatra hai");
     advice.push("Proper drainage ensure karen");
   }
   if (condition === "Clear" && temp >= 20 && temp <= 30) {
     advice.push("Aaj farming ke liye bahut achha din hai");
     advice.push("Beej boone ya fertilizer dene ke liye sahi samay");
   }
+
   return advice.length > 0
     ? advice
     : ["Mausam theek hai — normal farming jaari rakhen"];
@@ -173,6 +140,7 @@ function getFarmingAdvice(temp, humidity, condition) {
 // ============================================================
 app.get("/market-prices", async (req, res) => {
   const { crop, state } = req.query;
+
   try {
     const response = await fetch(
       `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${process.env.MARKET_API_KEY}&format=json&filters[commodity]=${crop || "Wheat"}&filters[state]=${state || "Punjab"}&limit=5`
@@ -204,20 +172,120 @@ app.get("/market-prices", async (req, res) => {
 // ============================================================
 // CROP CALENDAR ROUTE
 // ============================================================
-app.get("/crop-calendar", (req, res) => {
+app.get("/crop-calendar", async (req, res) => {
   const month = new Date().getMonth() + 1;
+
+  const calendar = {
+    1: {
+      season: "Rabi",
+      sow: ["Sunflower", "Spring Maize"],
+      harvest: ["Potato", "Mustard (late)"],
+      tasks: ["Wheat irrigation", "Rabi crop care", "Pest monitoring"],
+    },
+    2: {
+      season: "Rabi",
+      sow: ["Summer Moong", "Watermelon"],
+      harvest: ["Potato", "Gram"],
+      tasks: ["Wheat flowering stage care", "Mustard harvesting prep"],
+    },
+    3: {
+      season: "Zaid",
+      sow: ["Watermelon", "Cucumber", "Moong"],
+      harvest: ["Wheat (early)", "Mustard"],
+      tasks: ["Land prep for Zaid", "Summer crop irrigation"],
+    },
+    4: {
+      season: "Zaid",
+      sow: ["Moong", "Urad"],
+      harvest: ["Wheat", "Barley"],
+      tasks: ["Wheat harvesting", "Threshing and storage", "Land preparation"],
+    },
+    5: {
+      season: "Pre-Kharif",
+      sow: [],
+      harvest: ["Rabi crops complete"],
+      tasks: ["Deep ploughing", "Soil testing", "Seed selection for Kharif"],
+    },
+    6: {
+      season: "Kharif",
+      sow: ["Rice", "Maize", "Cotton", "Soybean", "Groundnut"],
+      harvest: [],
+      tasks: [
+        "Monsoon prep",
+        "Kharif sowing after first rain",
+        "Drainage arrangement",
+      ],
+    },
+    7: {
+      season: "Kharif",
+      sow: ["Bajra", "Jowar", "Sugarcane"],
+      harvest: [],
+      tasks: ["Rice transplanting", "Weed control", "Fertilizer application"],
+    },
+    8: {
+      season: "Kharif",
+      sow: [],
+      harvest: ["Early Maize"],
+      tasks: [
+        "Pest monitoring",
+        "Cotton bollworm control",
+        "Drainage in heavy rain",
+      ],
+    },
+    9: {
+      season: "Kharif",
+      sow: ["Rabi prep"],
+      harvest: ["Maize", "Groundnut"],
+      tasks: ["Kharif harvesting prep", "Rabi land preparation"],
+    },
+    10: {
+      season: "Rabi",
+      sow: ["Wheat", "Barley", "Mustard", "Gram"],
+      harvest: ["Rice", "Cotton (early)", "Soybean"],
+      tasks: ["Rabi sowing", "Rice harvesting", "Soil moisture check"],
+    },
+    11: {
+      season: "Rabi",
+      sow: ["Late Wheat", "Peas", "Lentil"],
+      harvest: ["Kharif complete", "Cotton"],
+      tasks: ["Wheat irrigation", "Rabi fertilization", "Winter care"],
+    },
+    12: {
+      season: "Rabi",
+      sow: ["Spring Potato"],
+      harvest: ["Late Cotton"],
+      tasks: [
+        "Frost protection",
+        "Wheat care",
+        "Irrigation scheduling",
+        "Pest control",
+      ],
+    },
+  };
+
   const monthNames = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
+
   res.json({
     month: monthNames[month - 1],
-    advice: CROP_CALENDAR[month],
+    ...calendar[month],
   });
 });
 
 // ============================================================
-// MAIN CHAT ROUTE
+// CHAT ROUTE WITH LIVE DATA
 // ============================================================
 app.post("/chat", rateLimiter, async (req, res) => {
   const { message, city } = req.body;
@@ -226,9 +294,9 @@ app.post("/chat", rateLimiter, async (req, res) => {
     return res.status(400).json({ error: "Message is required." });
   }
 
-  // Fetch live weather if city is provided
+  // Fetch live weather if city provided
   let liveWeatherContext = "";
-  if (city && process.env.WEATHER_API_KEY) {
+  if (city) {
     try {
       const wRes = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${process.env.WEATHER_API_KEY}&units=metric`
@@ -241,14 +309,29 @@ Temperature: ${wData.main.temp}°C
 Humidity: ${wData.main.humidity}%
 Condition: ${wData.weather[0].description}
 Wind: ${wData.wind.speed} km/h
-Farming advice: ${getFarmingAdvice(wData.main.temp, wData.main.humidity, wData.weather[0].main).join(", ")}`;
+Use this real data when answering weather questions.`;
       }
     } catch (e) {
       console.log("Weather fetch failed:", e.message);
     }
   }
 
+  // Get current crop calendar
   const month = new Date().getMonth() + 1;
+  const cropSeasons = {
+    1: "Rabi season — wheat, barley, mustard growing",
+    2: "Rabi season — harvest preparation",
+    3: "Zaid season — watermelon, cucumber sowing time",
+    4: "Zaid + Rabi harvest — wheat harvesting",
+    5: "Pre-Kharif — land prep, soil testing time",
+    6: "Kharif begins — rice, cotton, soybean sowing",
+    7: "Kharif — bajra, jowar, sugarcane sowing",
+    8: "Kharif growing — pest monitoring critical",
+    9: "Kharif harvest prep — maize, groundnut harvest",
+    10: "Rabi sowing — wheat, mustard, gram",
+    11: "Rabi — wheat irrigation, winter care",
+    12: "Rabi — frost protection, wheat care",
+  };
 
   try {
     const response = await fetch(
@@ -268,36 +351,28 @@ Farming advice: ${getFarmingAdvice(wData.main.temp, wData.main.humidity, wData.w
               role: "system",
               content: `You are Kisan Digital Sathi — specialized AI ONLY for Indian farmers.
 
-CURRENT SEASON (Month ${month}):
-${CROP_CALENDAR[month]}
+CURRENT SEASON CONTEXT:
+${cropSeasons[month]}
 ${liveWeatherContext}
 
 AGRICULTURE KNOWLEDGE BASE:
 ${FARMING_KNOWLEDGE}
 
 LANGUAGE RULES:
-- Hindi message → reply ONLY in Hindi
-- Gujarati message → reply ONLY in Gujarati
+- Hindi message → reply in Hindi only
+- Gujarati message → reply in Gujarati only
 - English message → reply in simple English
-- NEVER mix languages in one reply
-- Use simple words a farmer understands
+- Never mix languages
 
-RESPONSE RULES:
-- Answer ONLY farming, crops, weather, government schemes
-- Non-farming questions → say "Main sirf kheti aur sarkari yojanaon mein help kar sakta hoon 🌾"
-- Always give SPECIFIC answers — amounts, eligibility, how to apply
-- For schemes → eligibility + benefit amount + apply process
-- For crops → season + soil type + disease + fertilizer
-- For weather → use live data if available
-- Keep answers to max 6 lines
-- End with one helpful follow-up question
-- Urgent problems → always mention 1800-180-1551
-
-FORMAT:
-- Bullet points for lists
-- Specific ₹ amounts and dates
-- Never use technical jargon
-- Simple farmer-friendly language`,
+RESPONSE FORMAT:
+- Max 6 lines per answer
+- Use bullet points for lists
+- Always give specific amounts, dates, eligibility
+- For schemes: mention amount + eligibility + how to apply
+- For crops: mention season + soil + common disease
+- End with one follow-up question
+- Non-farming questions → "Main sirf kheti aur sarkari yojanaon mein help kar sakta hoon 🌾"
+- Always mention helpline 1800-180-1551 for urgent problems`,
             },
             {
               role: "user",
@@ -309,9 +384,7 @@ FORMAT:
     );
 
     const data = await response.json();
-
     if (!response.ok) {
-      console.error("Groq error:", data);
       return res
         .status(response.status)
         .json({ error: data?.error?.message || "API error" });
@@ -324,9 +397,6 @@ FORMAT:
   }
 });
 
-// ============================================================
-// START SERVER
-// ============================================================
 app.listen(PORT, () => {
-  console.log(`✅ Kisan Sathi backend running at http://localhost:${PORT}`);
+  console.log(`✅ Kisan Sathi backend at http://localhost:${PORT}`);
 });
