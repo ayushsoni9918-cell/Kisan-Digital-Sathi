@@ -213,3 +213,40 @@ button {
     gap: 8px;
   }
 }
+/* Hero layout fix */
+.hero .container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 40px !important;
+}
+
+.hero-content {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 60px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.hero-visual {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.hero-cards-stack {
+  width: 100% !important;
+  max-width: 480px !important;
+}
+
+/* Mobile fix */
+@media (max-width: 768px) {
+  .hero-content {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-visual {
+    display: none !important;
+  }
+}
