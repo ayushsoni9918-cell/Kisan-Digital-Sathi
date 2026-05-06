@@ -1,5 +1,5 @@
 // ✅ No API key here anymore!
-const BACKEND_URL = "https://kisan-digital-sathi.onrender.com"; // Change this after deploying
+const BACKEND_URL = "https://kisan-digital-sathi.onrender.com";
 
 const chatBox = document.querySelector(".chat-messages");
 const input = document.querySelector(".chat-input");
