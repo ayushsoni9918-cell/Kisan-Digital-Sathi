@@ -38,35 +38,68 @@ function removeTyping() {
   if (typing) typing.remove();
 }
 
+// Ask city once and save it
+let userCity = localStorage.getItem("userCity") || "";
+
 async function fetchReply(message) {
+
+  // Ask city if not set
+  if (!userCity) {
+
+    userCity = prompt(
+      "Aapka shehar/district kya hai? (e.g. Surat, Pune, Jaipur)"
+    ) || "";
+
+    localStorage.setItem("userCity", userCity);
+
+  }
+
   const response = await fetch(`${BACKEND_URL}/chat`, {
+
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+      message,
+      city: userCity
+    }),
+
   });
 
   const data = await response.json();
 
   if (!response.ok) {
+
     const err = new Error(data.error || "Server error");
+
     err.status = response.status;
+
     throw err;
+
   }
 
   return data.reply;
 }
-
 async function sendMessage() {
+
   const message = input.value.trim();
+
   if (!message) return;
 
   const now = Date.now();
+
   if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+
     addMessage(
       "⏳ Please wait a moment before sending another message.",
-      "bot",
+      "bot"
     );
+
     return;
+
   }
   lastRequestTime = now;
 
