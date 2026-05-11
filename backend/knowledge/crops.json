@@ -1,0 +1,47 @@
+{
+  "seasons": {
+    "kharif": {
+      "months": "June–October",
+      "crops": [
+        "Rice",
+        "Maize",
+        "Cotton",
+        "Sugarcane",
+        "Soybean",
+        "Groundnut",
+        "Bajra"
+      ]
+    },
+    "rabi": {
+      "months": "November–April",
+      "crops": ["Wheat", "Barley", "Mustard", "Gram", "Peas"]
+    },
+    "zaid": {
+      "months": "March–June",
+      "crops": ["Watermelon", "Cucumber", "Moong"]
+    }
+  },
+  "soil_types": {
+    "black_soil": {
+      "crops": ["Cotton", "Sugarcane", "Wheat"],
+      "states": ["Maharashtra", "MP", "Gujarat"]
+    },
+    "red_soil": {
+      "crops": ["Millets", "Pulses"],
+      "states": ["Tamil Nadu", "Karnataka"]
+    },
+    "alluvial_soil": {
+      "crops": ["Rice", "Wheat", "Sugarcane"],
+      "states": ["Punjab", "UP", "Bihar"]
+    },
+    "laterite_soil": {
+      "crops": ["Tea", "Coffee", "Cashew"],
+      "states": ["Kerala", "Karnataka"]
+    }
+  },
+  "fertilizer": {
+    "rice": { "N": 120, "P": 60, "K": 60 },
+    "wheat": { "N": 120, "P": 60, "K": 40 },
+    "cotton": { "N": 150, "P": 75, "K": 75 }
+  }
+}
